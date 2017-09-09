@@ -1,0 +1,37 @@
+version: '2.1'
+
+services:
+
+  # ADD DB SERVICE IF NOT USING RDS
+
+  redditwall-ui:
+    container_name: redditwall-ui
+    build:
+      context: ../reddit-media-wall
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3000 # expose ports - HOST:CONTAINER
+    # environment:
+      # - DATABASE_URL="some_rds_cnxn"
+      # - DATABASE_TEST_URL="same_cnxn_different_db"
+      # - SECRET_KEY=my_precious
+    # depends_on:
+    #   redditwall-db:
+    #     condition: service_healthy
+    # links:
+    #   - redditwall-db
+
+  nginx:
+    container_name: nginx
+    build: ./nginx/
+    restart: always
+    ports:
+      - 80:80
+    depends_on:
+      redditwall-ui:
+        condition: service_started
+    #  redditwall-db:
+    #   condition: service_started
+    links:
+      - redditwall-ui
+    #  - redditwall-db
